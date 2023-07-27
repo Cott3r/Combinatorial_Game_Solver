@@ -54,14 +54,17 @@ class GameStates:
                                 for possible_successor in non_processed_states:
                                     if possible_successor == successor_state:
                                         s.successor_states.append(possible_successor)
+                                        break
                         else:
                             for possible_successor in processed_states:
                                 if possible_successor == successor_state:
                                     s.successor_states.append(possible_successor)
+                                    break
                     else:
                         for possible_successor in new_non_processed_states:
                             if possible_successor == successor_state:
                                 s.successor_states.append(possible_successor)
+                                break
 
                 if not has_successor_state:
                     final_states.append(s)
@@ -85,6 +88,7 @@ class GameStates:
     def calculate_codes(self):
         for starting_state in self.starting_states:
             self.set_best_winning_state(starting_state)
+            #self.print_all_states(starting_state)
             starting_state.print_state()
 
     def set_best_winning_state(self, state):
@@ -125,9 +129,14 @@ class GameStates:
 
     def print_all_states(self, state):
         state.print_state()
+        # print(state.end_in_number_of_turns, end= " ")
+        #
+        # if len(state.successor_states) == 0:
+        #     print()
 
         for successor_state in state.successor_states:
-            self.print_all_states(successor_state)
+            if successor_state.winning_status == States.DRAW:
+                self.print_all_states(successor_state)
 
 
 if __name__ == '__main__':
@@ -136,5 +145,3 @@ if __name__ == '__main__':
     game_states = GameStates(tictactoe_3_players)
     game_states.enumerate_all_state()
     game_states.calculate_codes()
-
-    print("What")
