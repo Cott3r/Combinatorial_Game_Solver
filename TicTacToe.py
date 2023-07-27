@@ -21,11 +21,9 @@ class TicTacToe(Game):
 
             self.game = game
             self.board = board
-            self.number_of_half_moves = 0
 
         def print_state(self):
-            print(
-                f"Move: {self.number_of_half_moves} \tTurn of Player: {self.player_turn} \tReachable: {self.reachable} \tWinner: {self.winning_status} in {self.number_of_turns}")
+            print(f"Move: {self.number_of_half_moves} \tTurn of Player: {self.player_turn} \tReachable: {self.reachable} \tWinner: {self.winning_status} in {self.end_in_number_of_turns}")
             for row in self.board:
                 print(row)
 
@@ -80,49 +78,53 @@ class TicTacToe(Game):
                             self.board[row][column] = self.game.get_successor_player_turn(self.board[row][column])
 
         def get_canonical_successor_states(self):
-            self.successor_states = []
+            if len(self.successor_states) > 0:
+                return self.successor_states
 
             # If the game has ended, then no successor states exist
             if self.winning_status != States.UNKNOWN:
                 return self.successor_states
 
+            successor_states_local = []
+
             for row in range(self.game.board_size):
                 for column in range(self.game.board_size):
                     # Check if the field is empty
                     if (self.board[row][column] == self.game.empty_field_num):
-                        successor = copy.deepcopy(self)
+                        successor = self.copy()
 
                         # Calculate the successor state
                         successor.board[row][column] = successor.player_turn
                         successor.player_turn = self.game.get_successor_player_turn(successor.player_turn)
-
                         successor.number_of_half_moves = self.number_of_half_moves + 1
+
                         # successor.reachable = self.winning_status == None #TODO Check all previous states
                         # if successor.reachable:
 
                         successor = successor.get_canonical_state()
                         successor.winning_status = successor.get_winning_status()
 
-                        self.successor_states.append(successor)
+                        if not successor in successor_states_local:
+                            successor_states_local.append(successor)
 
-            return self.successor_states
+            return successor_states_local
 
         def get_canonical_state(self):
             all_equivalent_states = []
 
             # Get all rotations
             for rotation in range(4):
-                equivalent_state = copy.deepcopy(self)
+                equivalent_state = self.copy()
                 equivalent_state.rotate(rotation)
 
                 # Get all reflections
                 for reflections in range(3):
-                    equivalent_state = copy.deepcopy(equivalent_state)
+                    equivalent_state = equivalent_state.copy()
                     equivalent_state.mirror(reflections)
 
                     # Get all inversions (only 1 inversion exists)
                     for invert in range(2):
-                        equivalent_state = copy.deepcopy(equivalent_state)
+                        equivalent_state = equivalent_state.copy()
                         equivalent_state.invert(invert)
                         all_equivalent_states.append(equivalent_state)
 
@@ -138,7 +140,7 @@ class TicTacToe(Game):
             return all_equivalent_states[0]
 
         def get_winning_status(self):
-            state_copy = copy.deepcopy(self)
+            state_copy = self.copy()
 
             for i in range(2):
                 # Rows
@@ -177,8 +179,8 @@ class TicTacToe(Game):
             return States.UNKNOWN
 
         def __lt__(self, other):
-            lhs_copy = copy.deepcopy(self)
-            rhs_copy = copy.deepcopy(other)
+            lhs_copy = self.copy()
+            rhs_copy = other.copy()
 
             # Normalize the list so that the sorting is easier
             if lhs_copy.player_turn != 0:
@@ -199,11 +201,20 @@ class TicTacToe(Game):
         def __eq__(self, other):
             return self.player_turn == other.player_turn and self.board == other.board
 
+        def copy(self):
+            result = copy.deepcopy(self)
+            result.successor_states = []
+            return result
+
     def get_starting_states(self):
         starting_states = []
-        starting_states.append(self.TTT_GameState(self,
-                                                  [[self.empty_field_num, self.empty_field_num, self.empty_field_num],
-                                                   [self.empty_field_num, self.empty_field_num, self.empty_field_num],
-                                                   [self.empty_field_num, self.empty_field_num, self.empty_field_num]],
-                                                  self.starting_player))
+        new_state = self.TTT_GameState(self,
+                                      [[self.empty_field_num, self.empty_field_num, self.empty_field_num],
+                                       [self.empty_field_num, self.empty_field_num, self.empty_field_num],
+                                       [self.empty_field_num, self.empty_field_num, self.empty_field_num]],
+                                      self.starting_player)
+        starting_states.append(new_state.get_canonical_state())
+
+
+
         return starting_states

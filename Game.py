@@ -33,9 +33,11 @@ class States(Enum):
 class GameState():
 
     def __init__(self, player_turn, status=States.UNKNOWN):
-        self.number_of_turns = 0
+        self.number_of_half_moves = 0
         self.winning_status = States.UNKNOWN
+        self.end_in_number_of_turns = 0
         self.player_turn = player_turn
+        self.successor_states = []
 
         self.kingmaker_options = []
         self.reachable = True
