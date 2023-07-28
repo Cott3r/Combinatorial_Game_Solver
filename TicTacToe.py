@@ -51,9 +51,15 @@ class TicTacToe(Game):
                     temp = self.board[row][0]
                     self.board[row][0] = self.board[row][2]
                     self.board[row][2] = temp
+            # Mirror on the x-axis
+            if reflection == 2:
+                for column in range(self.game.board_size):
+                    temp = self.board[0][column]
+                    self.board[0][column] = self.board[2][column]
+                    self.board[2][column] = temp
 
             # Mirror on the diagonal axis
-            if reflection == 2:
+            if reflection == 3:
                 temp = self.board[1][0]
                 self.board[1][0] = self.board[0][1]
                 self.board[0][1] = temp
@@ -109,7 +115,7 @@ class TicTacToe(Game):
 
             return successor_states_local
 
-        def get_canonical_state(self):
+        def get_canonical_state(self, print_all_info=False):
             all_equivalent_states = []
 
             # Get all rotations
@@ -118,7 +124,7 @@ class TicTacToe(Game):
                 equivalent_state.rotate(rotation)
 
                 # Get all reflections
-                for reflections in range(3):
+                for reflections in range(4):
                     equivalent_state = equivalent_state.copy()
                     equivalent_state.mirror(reflections)
 
@@ -131,6 +137,11 @@ class TicTacToe(Game):
             # Sort all equivalent_states to get the canonical state
             all_equivalent_states.sort()
 
+            if print_all_info:
+                for s in all_equivalent_states:
+                    s.print_state()
+                exit(123)
+
             # print("Equivalent states:")
             # for s in all_equivalent_states:
             #    s.print_state()
@@ -138,6 +149,52 @@ class TicTacToe(Game):
             #all_equivalent_states[0].player_turn
 
             return all_equivalent_states[0]
+
+        def get_uncanonical_successor_state(self, canonical_successor_goal):
+            successor_states_local = []
+            asdf = None
+
+            for row in range(self.game.board_size):
+                for column in range(self.game.board_size):
+                    # Check if the field is empty
+                    if (self.board[row][column] == self.game.empty_field_num):
+                        successor = self.copy()
+                        asdf= successor
+
+                        # Calculate the successor state
+                        successor.board[row][column] = successor.player_turn
+                        successor.player_turn = self.game.get_successor_player_turn(successor.player_turn)
+                        successor.number_of_half_moves = self.number_of_half_moves + 1
+
+                        if successor.get_canonical_state() == canonical_successor_goal:
+                            self.successor_states.append(successor)
+                            successor.successor_states = canonical_successor_goal.successor_states
+                            successor.winning_status = canonical_successor_goal.winning_status
+                            successor.end_in_number_of_turns = canonical_successor_goal.end_in_number_of_turns
+                            return successor
+
+            print("\nError Uncanonical successor state not found")
+            canonical_successor_goal.print_state()
+            print("canonical_successor_goal.get_canonical_state().print_state()")
+            canonical_successor_goal.get_canonical_state().print_state()
+
+            print("Possible noncanonical states")
+            row = 1
+            column = 0
+            # Check if the field is empty
+            if (self.board[row][column] == self.game.empty_field_num):
+                successor = self.copy()
+
+                # Calculate the successor state
+                successor.board[row][column] = successor.player_turn
+                successor.player_turn = self.game.get_successor_player_turn(successor.player_turn)
+                successor.number_of_half_moves = self.number_of_half_moves + 1
+
+                print()
+                print("Noncanonical State")
+                successor.print_state()
+                print("How to calculate the canonical State")
+                successor.get_canonical_state(True).print_state()
 
         def get_winning_status(self):
             state_copy = self.copy()
@@ -193,10 +250,15 @@ class TicTacToe(Game):
 
             # First sort by the gameboard
             # Then by the player turn
-            if lhs_copy.board == rhs_copy.board:
-                return self.player_turn < other.player_turn
-            else:
+            #if lhs_copy.board == rhs_copy.board:
+            #    return self.player_turn < other.player_turn
+            #else:
+            #    return lhs_copy.board < rhs_copy.board
+
+            if self.player_turn == other.player_turn:
                 return lhs_copy.board < rhs_copy.board
+            else:
+                return self.player_turn < other.player_turn
 
         def __eq__(self, other):
             return self.player_turn == other.player_turn and self.board == other.board

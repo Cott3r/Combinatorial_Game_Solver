@@ -88,8 +88,6 @@ class GameStates:
     def calculate_codes(self):
         for starting_state in self.starting_states:
             self.set_best_winning_state(starting_state)
-            #self.print_all_states(starting_state)
-            starting_state.print_state()
 
     def set_best_winning_state(self, state):
 
@@ -139,9 +137,52 @@ class GameStates:
                 self.print_all_states(successor_state)
 
 
-if __name__ == '__main__':
-    tictactoe_3_players = TicTacToe.TicTacToe(2)
+    def print_gamestate_number_tree(self):
+        already_found_states = self.starting_states
+        next_states = self.starting_states
 
-    game_states = GameStates(tictactoe_3_players)
+        layer_number = 0
+
+        while len(next_states) > 0:
+
+            number_of_gamestates = 0
+            next_layer_states = []
+
+            for state in next_states:
+                number_of_gamestates += 1
+
+                for successor_state in state.successor_states:
+                    if successor_state not in next_layer_states:
+                        if successor_state not in already_found_states:
+                            next_layer_states.append(successor_state)
+
+
+            print(f"Layer: {layer_number}  Number of Gamestates: {number_of_gamestates}")
+
+
+            #Go on to next layer
+            next_states = next_layer_states
+            already_found_states.extend(next_layer_states)
+            layer_number += 1
+
+    def print_best_path(self, state):
+        state.print_state()
+
+        #Get the best first option
+        for canonical_successor_state in state.successor_states:
+            if canonical_successor_state.winning_status == state.winning_status:
+
+                #self.print_best_path(canonical_successor_state)
+                self.print_best_path(state.get_uncanonical_successor_state(canonical_successor_state))
+                break
+
+
+if __name__ == '__main__':
+    tictactoe_game = TicTacToe.TicTacToe(3)
+
+    game_states = GameStates(tictactoe_game)
     game_states.enumerate_all_state()
     game_states.calculate_codes()
+
+    game_states.print_best_path(game_states.starting_states[0])
+    game_states.print_gamestate_number_tree()
