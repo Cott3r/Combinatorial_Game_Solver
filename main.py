@@ -6,6 +6,7 @@
 import copy
 import Game
 import TicTacToe
+import HeyDontgetAngry
 from Game import *
 
 class GameStates:
@@ -178,9 +179,10 @@ class GameStates:
 
 
 if __name__ == '__main__':
-    tictactoe_game = TicTacToe.TicTacToe(3)
+    game = TicTacToe.TicTacToe(3)
+    #game = HeyDontgetAngry.HeyDontgetAngry(3)
 
-    game_states = GameStates(tictactoe_game)
+    game_states = GameStates(game)
     game_states.enumerate_all_state()
     game_states.calculate_codes()
 
