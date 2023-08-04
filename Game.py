@@ -1,4 +1,5 @@
 from enum import Enum
+import copy
 
 
 class Game:
@@ -41,3 +42,8 @@ class GameState():
 
         self.kingmaker_options = []
         self.reachable = True
+
+    def copy(self):
+        result = copy.deepcopy(self)
+        result.successor_states = []
+        return result

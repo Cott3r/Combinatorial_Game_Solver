@@ -68,6 +68,8 @@ class GameStates:
                                 break
 
                 if not has_successor_state:
+                    s.winning_status = s.get_winning_status()
+                    s.print_state()
                     final_states.append(s)
 
             processed_states.extend(non_processed_states)
@@ -180,10 +182,9 @@ class GameStates:
 
 if __name__ == '__main__':
     #game = TicTacToe.TicTacToe(3)
-    game = HeyDontgetAngry.HeyDontgetAngry(3)
-    game.test()
+    game = HeyDontgetAngry.HeyDontgetAngry(2)
+    #game.test()
 
-    exit(1)
     game_states = GameStates(game)
     game_states.enumerate_all_state()
     game_states.calculate_codes()

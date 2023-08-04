@@ -119,7 +119,7 @@ class TTT_GameState(GameState):
                     # if successor.reachable:
 
                     successor = successor.get_canonical_state()
-                    successor.winning_status = successor.get_winning_status()
+                    #successor.winning_status = successor.get_winning_status()
 
                     if not successor in successor_states_local:
                         successor_states_local.append(successor)
@@ -273,8 +273,3 @@ class TTT_GameState(GameState):
 
     def __eq__(self, other):
         return self.player_turn == other.player_turn and self.board == other.board
-
-    def copy(self):
-        result = copy.deepcopy(self)
-        result.successor_states = []
-        return result
