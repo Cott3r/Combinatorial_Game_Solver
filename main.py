@@ -179,9 +179,11 @@ class GameStates:
 
 
 if __name__ == '__main__':
-    game = TicTacToe.TicTacToe(3)
-    #game = HeyDontgetAngry.HeyDontgetAngry(3)
+    #game = TicTacToe.TicTacToe(3)
+    game = HeyDontgetAngry.HeyDontgetAngry(3)
+    game.test()
 
+    exit(1)
     game_states = GameStates(game)
     game_states.enumerate_all_state()
     game_states.calculate_codes()
